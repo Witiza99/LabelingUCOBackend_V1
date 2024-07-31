@@ -205,7 +205,17 @@ async function processVideo(videoPath, requestedFrameRate, maxFrameRate, outputD
         ffmpegProcess.on('close', (code) => {
             if (code === 0) {
                 // Get paths
-                const imagePaths = getFilePathsInDirectory(outputDir);
+                let imagePaths = getFilePathsInDirectory(outputDir);
+                // Sort image paths
+                imagePaths = imagePaths.sort((a, b) => {
+                    const aMatch = a.match(/(\d+)\.png$/); // Extrae el número del fotograma del nombre del archivo 'a'
+                    const bMatch = b.match(/(\d+)\.png$/); // Extrae el número del fotograma del nombre del archivo 'b'
+
+                    if (aMatch && bMatch) {
+                        return parseInt(aMatch[1], 10) - parseInt(bMatch[1], 10); // Compara los números de los fotogramas
+                    }
+                    return 0; // Si no se puede extraer el número, no cambia el orden
+                });
                 resolve(imagePaths);
             } else {
                 reject(`Error with FFmpeg -> ${code}`);
