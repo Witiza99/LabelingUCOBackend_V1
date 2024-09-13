@@ -17,9 +17,18 @@ const exiftool = new ExifTool();
 
 // Cors conf
 const corsOptions = {
-    origin: process.env.CORS_ORIGIN || 'http://localhost:4200', // frontend Angular URL
-    optionsSuccessStatus: 200, 
+    origin: (origin, callback) => {
+        const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:4200').split(',');
+
+        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    optionsSuccessStatus: 200
 };
+
 
 // Multer conf
 const upload = multer({ dest: os.tmpdir() });
@@ -29,8 +38,23 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors(corsOptions));
 
+/***********test*********/
+/*
+// Middleware to test incoming requests
+app.use((req: Request, res: Response, next: NextFunction) => {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+    console.log('Encabezados:', req.headers);
+    console.log('Cuerpo:', req.body);
+    next();
+});*/
+
 
 /*******************************API***********************************/
+// Endpoint to test backend
+app.get('/test', (req, res) => {
+    res.json({ message: 'Hello world' });
+  });
+
 // Get file and frame rate, return zip with images from video processing
 app.post('/api/process-video', upload.array('files'), async (req, res) => {
     const frameRates = JSON.parse(req.body.frameRates);
