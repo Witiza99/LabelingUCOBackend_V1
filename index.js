@@ -12,22 +12,31 @@ const { v4: uuidv4 } = require('uuid');
 
 /****************************Conf/Variable***********************************/
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 const exiftool = new ExifTool();
 
 // Cors conf
 const corsOptions = {
     origin: (origin, callback) => {
-        const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:4200').split(',');
+        const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:4201').split(',');
 
+        // Registrar el origen de la solicitud
+        console.log('Solicitud recibida desde el origen:', origin);
+        // Log para verificar los orígenes permitidos
+        console.log('Orígenes permitidos:', allowedOrigins);
+
+        // Verificar si el origen está permitido
         if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-            callback(null, true);
+            console.log('Origin allowed:', origin); // Log si el origen está permitido
+            callback(null, true); // Permitir el origen
         } else {
-            callback(new Error('Not allowed by CORS'));
+            console.log('Origin not allowed:', origin); // Log si el origen no está permitido
+            callback(new Error('Not allowed by CORS')); // Bloquear el origen
         }
     },
-    optionsSuccessStatus: 200
+    optionsSuccessStatus: 200 // Para manejar correctamente el status de las opciones
 };
+
 
 
 // Multer conf
